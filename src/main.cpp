@@ -1,103 +1,163 @@
-// TODO: Refactor using OOP; split into app.h, app.cpp, main.cpp.
-// This template shows how to set a custom window icon and handle custom menu actions on the Win32 title bar.
-// Note: Uses platform-specific WinAPI, but simplifies window resizing and control handling.
-
-
 #include <FL/Fl.H>
 #include <FL/x.H>
 #include <FL/Fl_Window.H>
-#include <FL/Fl_Menu_Button.H>
-#include <FL/fl_ask.H> 
+#include <FL/fl_ask.H>
 #include <windows.h>
 
-// Оригинальный обработчик сообщений окна
-WNDPROC originalWindowProc;
+#include <vector>
+#include <memory>
 
-// Ваше собственное системное меню
-HMENU hCustomMenu;
+class CWindow : public Fl_Window {
+private:
+    WNDPROC originalWindowProc;
+    HMENU hCustomMenu;
 
-LRESULT CALLBACK CustomWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    switch (uMsg) {
-        case WM_SYSCOMMAND:
-            // Перехватываем только нажатие на иконку окна
-            if ((wParam & 0xFFF0) == SC_MOUSEMENU) {
-                RECT clientRect;
-                GetClientRect(hwnd, &clientRect);
+    bool aсtive;
 
-                // Преобразуем координаты клиентской области в экранные
-                POINT topLeft = { clientRect.left, clientRect.top };
-                ClientToScreen(hwnd, &topLeft);
+private:
+    void setWindowIcon();
+    void setCustomWindowProc();
+    void createMenu();
 
-                // Отображаем кастомное меню в верхнем левом углу окна
-                int cmd = TrackPopupMenu(hCustomMenu, TPM_RETURNCMD | TPM_LEFTBUTTON, topLeft.x, topLeft.y, 0, hwnd, nullptr);
-                
-                if (cmd == 1001) {
-                    fl_alert("Выбрано: Открыть");
-                } else if (cmd == 1002) {
-                    fl_alert("Выбрано: Сохранить");
-                } else if (cmd == 1003) {
-                    PostQuitMessage(0);
-                }
-                return 0; // Предотвращаем стандартное системное меню
-            }
+    static LRESULT CALLBACK CustomWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    void showCustomMenu(HWND hwnd);
 
-            // Для всех остальных системных команд передаём управление стандартному обработчику
-            if (wParam == SC_SIZE || wParam == SC_MOVE || wParam == SC_MINIMIZE || wParam == SC_MAXIMIZE || wParam == SC_CLOSE) {
-                return DefWindowProc(hwnd, uMsg, wParam, lParam);
-            }
-            break;
-    }
 
-    // Для всех остальных сообщений вызываем оригинальный обработчик
-    return CallWindowProc(originalWindowProc, hwnd, uMsg, wParam, lParam);
+public:
+    CWindow(int width, int height, const char* title);
+    ~CWindow();
+
+    void initialize();
+};
+
+CWindow::CWindow(int width, int height, const char* title): Fl_Window(width, height, title) {
+    resizable(this);
+    createMenu();
 }
 
-void set_window_icon(Fl_Window* window) {
-    HWND hwnd = fl_xid(window);
-    if (hwnd == nullptr) {
-        fl_alert("Не удалось получить дескриптор окна");
-        return;
-    }
+CWindow::~CWindow() {}
 
-    HICON hIcon = (HICON)LoadImageA(
-        nullptr,
-        "menu_icon.ico",
-        IMAGE_ICON,
-        32, 32,
-        LR_LOADFROMFILE
-    );
-
-    if (hIcon) {
-        SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
-        SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
-    } else {
-        fl_alert("Не удалось загрузить иконку");
-    }
+void CWindow::initialize() {
+    setWindowIcon();
+    setCustomWindowProc();
 }
 
-void SetCustomWProc(Fl_Window* window) {
-    HWND hwnd = fl_xid(window);
-    originalWindowProc = (WNDPROC)GetWindowLongPtr(hwnd, GWLP_WNDPROC);
-    SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)CustomWindowProc);
-}
-
-void create_custom_menu() {
-    // Создаём новое меню
+void CWindow::createMenu() {
     hCustomMenu = CreatePopupMenu();
-    AppendMenuW(hCustomMenu, MF_STRING, 1001, L"Открыть");
-    AppendMenuW(hCustomMenu, MF_STRING, 1002, L"Сохранить");
-    AppendMenuW(hCustomMenu, MF_STRING, 1003, L"Выход");
+    AppendMenuW(hCustomMenu, MF_STRING, 1001, L"New");
+    AppendMenuW(hCustomMenu, MF_STRING, 1002, L"Open");
+    AppendMenuW(hCustomMenu, MF_STRING, 1003, L"Delete");
+    AppendMenuW(hCustomMenu, MF_STRING, 1004, L"Exit");
 }
+
+void CWindow::setWindowIcon() {
+    HWND hwnd = fl_xid(this);
+    if (hwnd) {
+        HICON hIcon = (HICON)LoadImageA(nullptr, "menu_icon.ico", IMAGE_ICON, 32, 32, LR_LOADFROMFILE);
+        if (hIcon) {
+            SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+            SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+        } else {
+            fl_alert("Не удалось загрузить иконку");
+        }
+    }
+}
+
+void CWindow::setCustomWindowProc() {
+    HWND hwnd = fl_xid(this);
+    if (hwnd) {
+        originalWindowProc = (WNDPROC)GetWindowLongPtr(hwnd, GWLP_WNDPROC);
+        SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this);
+        SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)CustomWindowProc);
+    }
+}
+
+LRESULT CALLBACK CWindow::CustomWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    CWindow* self = reinterpret_cast<CWindow*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+    if (self) {
+        switch (uMsg) {
+            case WM_SYSCOMMAND:
+                if ((wParam & 0xFFF0) == SC_MOUSEMENU) {
+                    self->showCustomMenu(hwnd);
+                    return 0;
+                }
+                break;
+        }
+        return CallWindowProc(self->originalWindowProc, hwnd, uMsg, wParam, lParam);
+    }
+    return DefWindowProc(hwnd, uMsg, wParam, lParam);
+}
+
+void CWindow::showCustomMenu(HWND hwnd) {
+    RECT clientRect;
+    GetClientRect(hwnd, &clientRect);
+    POINT topLeft = { clientRect.left, clientRect.top };
+    ClientToScreen(hwnd, &topLeft);
+
+    int cmd = TrackPopupMenu(hCustomMenu, TPM_RETURNCMD | TPM_LEFTBUTTON, topLeft.x, topLeft.y, 0, hwnd, nullptr);
+    if (cmd == 1001) {
+        fl_alert("New action");
+    } 
+    else if (cmd == 1002) {
+        fl_alert("Open action");
+    }
+    else if (cmd == 1003) {
+        fl_alert("Delete action");
+    }  
+    else if (cmd == 1004) {
+        //Exit action
+        fl_alert("Exit action");
+        //PostQuitMessage(0);
+    }
+}
+
+
+//
+// CApp
+//
+class CApp {
+private:
+    std::vector<std::unique_ptr<CWindow>> windows;
+    int openWindows = 0;
+
+private:
+    CApp() = default;
+    ~CApp() = default;
+    CApp(const CApp&) = delete;
+    CApp& operator=(const CApp&) = delete;
+
+public:
+    static CApp& getInstance() {
+        static CApp instance;
+        return instance;
+    }
+
+    void run() {
+        createWindow(300, 300, "Sticky Note 1");
+        createWindow(300, 300, "Sticky Note 2");
+        
+        Fl::run();
+    }
+
+    void createWindow(int width, int height, const char* title) {
+        auto window = std::make_unique<CWindow>(width, height, title);
+        window->show();
+        window->initialize();
+        windows.push_back(std::move(window));
+        openWindows++;
+    }
+
+    void onWindowClose() {
+        openWindows--;
+        if (openWindows == 0) {
+            exit(0);
+        }
+    }
+};
 
 int main() 
 {
-    Fl_Window window(400, 300, "FLTK Window with Custom Icon Action");
-    window.resizable(window);
-    window.show();
+    CApp::getInstance().run();
 
-    create_custom_menu();
-    SetCustomWProc(&window);
-    set_window_icon(&window);
-
-    return Fl::run();
+    return 0;
 }
