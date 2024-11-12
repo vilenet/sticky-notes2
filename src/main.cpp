@@ -1,6 +1,7 @@
-//TODO: implement OOP and divide program to app.h app.cpp main.cpp 
-//(This is a templete, how to download custom window icon 
-//and how to initialize custom menu on pressing for window label (win32 window))
+// TODO: Refactor using OOP; split into app.h, app.cpp, main.cpp.
+// This template shows how to set a custom window icon and handle custom menu actions on the Win32 title bar.
+// Note: Uses platform-specific WinAPI, but simplifies window resizing and control handling.
+
 
 #include <FL/Fl.H>
 #include <FL/x.H>
