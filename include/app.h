@@ -1,39 +1,28 @@
 #ifndef APP_H
 #define APP_H
 
-#include <FL/Fl.H>
-#include <FL/Fl_Box.H>
-#include <FL/Fl_Window.H>
-#include <FL/Fl_Button.H>
-#include <FL/Fl_Menu_Bar.H>
-#include <FL/Fl_Menu_Button.H>
-#include <FL/Fl_Text_Editor.H>
-#include <FL/Fl_Text_Buffer.H>
-
-#include <windows.h>
-#include <FL/x.H>
-
-#include <cstdio>
-#include <string>
-#include <limits>
+#include "window.h"
 #include <vector>
-#include <limits>
+#include <memory>
 
 
-class StickyNoteApp : public Fl_Window {
+class CApp {
 private:
-    Fl_Text_Editor text_editor {0, 25, 300, 300};
-    Fl_Text_Buffer text_buffer;
-    Fl_Color editor_color;
+    std::vector<std::unique_ptr<CWindow>> windows;
+    int openWindows = 0;
 
-    bool text_changed;
-    char filename[FILENAME_MAX];
+private:
+    CApp() = default;
+    ~CApp() = default;
+    CApp(const CApp&) = delete;
+    CApp& operator=(const CApp&) = delete;
 
 public:
-    StickyNoteApp();
-    ~StickyNoteApp();
+    static CApp& getInstance();
 
+    void run();
+    void createWindow(int width, int height, const char* title);
+    void onWindowClose();
 };
-
 
 #endif // APP_H

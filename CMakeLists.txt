@@ -7,10 +7,9 @@ set(FLTK_LIBRARY_DIR "C:/libs/fltk/lib")
 find_package(FLTK REQUIRED PATHS "C:/libs/fltk" NO_DEFAULT_PATH)
 
 include_directories(${FLTK_INCLUDE_DIR})
-#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-#add_executable(sticky-notes2 src/main.cpp src/app.cpp)
-add_executable(sticky-notes2 src/main.cpp)
+add_executable(sticky-notes2 src/main.cpp src/app.cpp src/window.cpp)
 
 set(CMAKE_EXE_LINKER_FLAGS "-static -static-libgcc -static-libstdc++")
 
