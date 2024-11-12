@@ -1,5 +1,7 @@
 # Sticky Notes Program — Version 2
 
+- [Version 1](https://github.com/vilenet/sticky-notes.git)
+
 ### Overview
 This is the **second version** of the Sticky Notes program, designed to utilize a standard Win32 window with a built-in title bar. However, it introduces **custom behavior** for the window icon (located in the top-left corner), effectively transforming it into a functional button. This approach allows for creating a faux button using the window icon area, enhancing the window's interactivity without modifying the native title bar.
 
