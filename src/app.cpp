@@ -41,8 +41,12 @@ Data* App::CreateData() { dbgout("");
     return data;
 }
 
-void App::CreateNote(Data* data) { dbgout("");
-    if (!data) { data = CreateData(); }
+void App::CreateNote(Data* data, int x, int y) { dbgout("");
+    if (!data) { 
+        data = CreateData(); 
+        data->x = x;
+        data->y = y;
+    }
     data->state = true;
     auto it = Notes.find(data->id);
     if (it != Notes.end()) { it->second->show(); }

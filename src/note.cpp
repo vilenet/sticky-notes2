@@ -178,7 +178,12 @@ void Note::action_close() { dbgout("");
     UpdateData();
     hide();
 }
-void Note::action_new()    { dbgout(""); m_pApp->CreateNote(nullptr); }
+void Note::action_new()    { dbgout(""); 
+    int newX = x() + 20;
+    int newY = y() + 20;
+    m_pApp->CreateNote(nullptr, newX, newY); 
+}
+
 void Note::action_open()   { dbgout(""); m_pApp->OpenNote(); }
 void Note::action_delete() { dbgout(""); m_pApp->DeleteNote(getId()); }
 void Note::action_exit()   { dbgout(""); exit(0); }

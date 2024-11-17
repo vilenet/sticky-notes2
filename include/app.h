@@ -6,7 +6,6 @@
 #include "note.h"
 
 class Note;
-//class Data;
 
 
 class App {
@@ -27,7 +26,7 @@ public:
     void LoadFile();
     void BuildNotes();
     Data* CreateData();
-    void CreateNote(Data* data = nullptr);
+    void CreateNote(Data* data = nullptr, int = 100, int = 100);
     void UpdateData(Data* data);
     void UpdateFile();
     void OpenNote();
