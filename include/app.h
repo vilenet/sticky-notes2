@@ -30,8 +30,8 @@ public:
     void UpdateData(Data* data);
     void UpdateFile();
     void OpenNote();
-    //void DeleteData(int id);
-    void DeleteNote(int id);
+    void DeleteNote(int id, Note* pNote);
+    void DeleteNoteData(int id);
 };
 
 #endif // APP_H

@@ -99,7 +99,7 @@ LRESULT CALLBACK Note::WinProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             case WM_SYSCOMMAND:    if ((wParam & 0xFFF0) == SC_MOUSEMENU) { view->showMenu(); return 0; } break;
             case WM_CLOSE: 
                 view->action_close();
-                return DefWindowProc(hwnd, uMsg, wParam, lParam);
+                return 0;
         }
         return CallWindowProc(view->winProc, hwnd, uMsg, wParam, lParam);
     }
@@ -126,8 +126,6 @@ void Note::resize(int X, int Y, int W, int H) { dbgout("");
         Fl_Window::resize(X, Y, W, H);
         isPositionChanged = (m_data->x != X || m_data->y != Y);
         isSizeChanged = (m_data->w != W || m_data->h != H);
-        
-        // m_data->x = X;m_data->y = Y;m_data->w = W;m_data->h = H;
         UpdateData();
     }
 }
@@ -135,7 +133,7 @@ void Note::resize(int X, int Y, int W, int H) { dbgout("");
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Update, Save, Load methods Implementation of Note
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Note::UpdateData() { dbgout("");
+void Note::UpdateData() { 
     bool needsSave = false;
 
     if (isStateChanged) { needsSave = true; }
@@ -174,10 +172,12 @@ void Note::UpdateData() { dbgout("");
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Note::action_close() { dbgout("");
     setState(false); 
-    isStateChanged = true; 
+    isStateChanged = true;
     UpdateData();
     hide();
+    if (m_pApp) m_pApp->DeleteNote(getId(), this);
 }
+
 void Note::action_new()    { dbgout(""); 
     int newX = x() + 20;
     int newY = y() + 20;
@@ -185,5 +185,5 @@ void Note::action_new()    { dbgout("");
 }
 
 void Note::action_open()   { dbgout(""); m_pApp->OpenNote(); }
-void Note::action_delete() { dbgout(""); m_pApp->DeleteNote(getId()); }
+void Note::action_delete() { dbgout(""); m_pApp->DeleteNoteData(getId()); }
 void Note::action_exit()   { dbgout(""); exit(0); }
