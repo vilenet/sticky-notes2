@@ -20,7 +20,8 @@ add_executable(sticky-notes2
     src/settings.cpp
 )
 
-set(CMAKE_EXE_LINKER_FLAGS "-static -static-libgcc -static-libstdc++")
+# Remove the "-mwindows" flag to enable CMD Console
+set(CMAKE_EXE_LINKER_FLAGS "-mwindows -static -static-libgcc -static-libstdc++")
 
 target_link_libraries(sticky-notes2
     ${FLTK_LIBRARY_DIR}/libfltk.a

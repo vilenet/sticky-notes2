@@ -9,7 +9,7 @@ Settings::Settings(int parent_x, int parent_y, int parent_w, Note* pNote)
     , m_space(15)
     , m_cols(6)
     , m_rows(1)
-    , m_pNote(pNote) { dbgout("Settings Constructor");
+    , m_pNote(pNote) {
 
     //border(0);
     set_modal();

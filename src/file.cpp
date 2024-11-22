@@ -6,14 +6,14 @@
 #include <sstream>
 
 
-void FileUtil::Init() { dbgout("");
+void FileUtil::Init() { 
     std::filesystem::path dataDir("data");
     if (!std::filesystem::exists(dataDir)) {
         std::filesystem::create_directory(dataDir);
     }
 }
 
-std::string FileUtil::Read() { dbgout("");
+std::string FileUtil::Read() { 
     std::ifstream inFile(filePath);
     if (!inFile.is_open()) return "";
     std::ostringstream oss;
@@ -21,7 +21,7 @@ std::string FileUtil::Read() { dbgout("");
     return oss.str();
 }
 
-void FileUtil::Write(const std::string& str) { dbgout("");
+void FileUtil::Write(const std::string& str) { 
     std::ofstream outFile(filePath);
     if (outFile.is_open()) {
         outFile << str;

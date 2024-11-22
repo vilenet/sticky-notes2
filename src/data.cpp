@@ -3,7 +3,7 @@
 #include <sstream>
 
 
-std::unordered_map<int, Data*> DataUtil::Str2Data(const std::string& dataStr) { dbgout("");
+std::unordered_map<int, Data*> DataUtil::Str2Data(const std::string& dataStr) { 
     std::unordered_map<int, Data*> Datas;
     std::istringstream iss(dataStr);
     std::string line;
@@ -37,7 +37,7 @@ std::unordered_map<int, Data*> DataUtil::Str2Data(const std::string& dataStr) { 
     return Datas;
 }
 
-std::string DataUtil::Data2Str(const std::unordered_map<int, Data*>& datas) { dbgout("");
+std::string DataUtil::Data2Str(const std::unordered_map<int, Data*>& datas) { 
     std::ostringstream oss;
     for (const auto& pair : datas) {
         const Data* data = pair.second;

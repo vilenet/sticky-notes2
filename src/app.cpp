@@ -3,17 +3,17 @@
 #include "dout.h"
 
 
-App::App() { dbgout("");
+App::App() { 
     UtilFile.Init();
 }
 
-void App::Run() { dbgout("");
+void App::Run() { 
     LoadData();
     BuildNotes();
     Fl::run();
 }
 
-void App::LoadData() { dbgout("");
+void App::LoadData() { 
     std::string str = UtilFile.Read();
     Datas = UtilData.Str2Data(str);
 
@@ -23,12 +23,12 @@ void App::LoadData() { dbgout("");
     }
 }
 
-void App::BuildNotes() { dbgout("");
+void App::BuildNotes() { 
     for (const auto& pair : Datas) { CreateNote(pair.second); }
     if (Datas.empty()) { CreateNote(nullptr); }
 }
 
-void App::OpenNote() { dbgout("");
+void App::OpenNote() { 
     NoteSelector selector(Datas);
     Data* selectedData = selector.select();
     if (selectedData) {
@@ -36,14 +36,14 @@ void App::OpenNote() { dbgout("");
     }
 }
 
-Data* App::CreateData() { dbgout("");
+Data* App::CreateData() { 
     Data* data = new Data();
     data->id = nextID++;
     Datas[data->id] = data;
     return data;
 }
 
-void App::CreateNote(Data* data, int x, int y) { dbgout("");
+void App::CreateNote(Data* data, int x, int y) { 
     if (!data) { 
         data = CreateData(); 
         data->x = x;
@@ -56,17 +56,17 @@ void App::CreateNote(Data* data, int x, int y) { dbgout("");
     UpdateFile();
 }
 
-void App::UpdateData(Data* data) { dbgout("");
+void App::UpdateData(Data* data) { 
     Datas[data->id] = data;
     UpdateFile();
 }
 
-void App::UpdateFile() { dbgout("");
+void App::UpdateFile() { 
     std::string strData = UtilData.Data2Str(Datas);
     UtilFile.Write(strData);
 }
 
-void App::DeleteNote(int id, Note* note) { dbgout("");
+void App::DeleteNote(int id, Note* note) { 
     if (Notes[id] == note) {
         delete note;
         Notes[id] = nullptr;
@@ -74,7 +74,7 @@ void App::DeleteNote(int id, Note* note) { dbgout("");
 }
 
 // Deletes: Note from Notes, Data from Datas, record from file
-void App::DeleteNoteData(int id) { dbgout("");
+void App::DeleteNoteData(int id) { 
     auto noteIt = Notes.find(id);
     if (noteIt != Notes.end()) {
         Note* note = noteIt->second;

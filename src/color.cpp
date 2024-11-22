@@ -4,7 +4,7 @@
 #include <iomanip>
 
 
-std::string ColorUtil::color2str(Fl_Color fcolor) { dbgout("");
+std::string ColorUtil::color2str(Fl_Color fcolor) { 
     unsigned char r, g, b;
     Fl::get_color(fcolor, r, g, b);
     std::ostringstream oss;
@@ -14,7 +14,7 @@ std::string ColorUtil::color2str(Fl_Color fcolor) { dbgout("");
     return oss.str();
 }
 
-Fl_Color ColorUtil::str2color(const std::string &scolor) { dbgout("");
+Fl_Color ColorUtil::str2color(const std::string &scolor) { 
     if (scolor.length() != 6) return FL_BLACK;
     uint32_t ucolor = std::stoul(scolor, nullptr, 16);
     unsigned char r = (ucolor >> 16) & 0xFF;

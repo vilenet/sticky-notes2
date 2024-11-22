@@ -6,7 +6,6 @@ int debug_counter = 0;
 
 int main() 
 {
-    dbgout("Starting application");
     App app;
     app.Run();
     return 0;
