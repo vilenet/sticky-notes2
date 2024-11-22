@@ -3,18 +3,24 @@
 
 #include "data.h"
 #include "app.h"
+#include "color.h"
 
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Menu_Button.H>
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/x.H>
+#include <FL/Fl_Box.H>
 
 #include <windows.h>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 #include <string>
+
+using Str = std::string;
 
 class App;
 
@@ -24,7 +30,7 @@ private:
     Data* m_data;
     App*  m_pApp;
 
-    Fl_Color fl_color;
+    Fl_Color m_Flcolor;
     Fl_Text_Editor editor;
     Fl_Text_Buffer buffer;
 
@@ -36,7 +42,7 @@ private:
     bool isSizeChanged = false;
     bool isStateChanged = false;
     bool isColorChanged = false;
-    bool isNewNote = true;
+    bool isTitleChanged = false;
 
 private:
     static void textChangedCallback(Fl_Widget* widget, void* userdata);
@@ -47,15 +53,18 @@ public:
     ~Note();
 
     int  getId() const;
-    void setText(const std::string& text);
-    std::string  getText() const;
+    Str  getTitle() const;
+    void setTitle(const Str& name);
+    void setText(const Str& text);
+    Str  getText() const;
     void setState(bool);
     bool getState();
-    bool isNew();
+    void setColor(Fl_Color);
+    Fl_Color getColor();
 
     // Icon & Menu
     HWND getHWND();
-    void setIcon(const std::string& iconPath);
+    void setIcon(const Str& iconMenu, const Str& iconTaskbar);
     void createMenu();
     void showMenu();
     void handleMenu(int command);
@@ -63,6 +72,7 @@ public:
     static LRESULT CALLBACK WinProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     // Actions 
+    void action_settings();
     void action_close();
     void action_new();
     void action_open();
@@ -71,10 +81,14 @@ public:
 
     void UpdateData();
 
+    // Overrided
     void resize(int X, int Y, int W, int H) override;
 
-    // Нужно ли нам это?
-    friend class App; // Allow App to access private members
+    //TODO remove
+    friend class App;
+
+    void setColorChanged(bool);
+    void setTitleChanged(bool);
 };
 
 #endif // NOTE_H

@@ -36,71 +36,12 @@ void App::OpenNote() { dbgout("");
     }
 }
 
-
-// void App::OpenNote() {
-//     NoteSelector selector(Datas);
-//     Data* selectedData = selector.select();
-//     if (selectedData) {
-//         auto it = Notes.find(selectedData->id);
-//         if (it != Notes.end()) {
-//             Note* note = it->second;
-//             note->setState(true);
-//             note->show();
-//             note->setIcon("menu_icon.ico");
-//             //note->initMenu();
-//         } else {
-//             CreateNote(selectedData);
-//         }
-//     }
-// }
-
-// Icon work, Menu not work
-// void App::OpenNote() {
-//     NoteSelector selector(Datas);
-//     Data* selectedData = selector.select();
-//     if (selectedData) {
-//         auto it = Notes.find(selectedData->id);
-//         if (it != Notes.end()) {
-//             Note* note = it->second;
-//             note->setState(true);
-//             note->show();
-//             note->InitMenu();
-//             note->setWinProc();
-//         } else {
-//             CreateNote(selectedData);
-//         }
-//     }
-// }
-
-// void App::OpenNote() { dbgout("");
-//     NoteSelector selector(Datas);
-//     Data* selectedData = selector.select();
-//     if (selectedData) { CreateNote(selectedData); }
-// }
-
 Data* App::CreateData() { dbgout("");
     Data* data = new Data();
     data->id = nextID++;
     Datas[data->id] = data;
     return data;
 }
-
-// void App::CreateNote(Data* data, int x, int y) { dbgout("");
-//     if (!data) { 
-//         data = CreateData(); 
-//         data->x = x;
-//         data->y = y;
-//     }
-//     data->state = true;
-//     auto it = Notes.find(data->id);
-//     if (it != Notes.end()) { it->second->show(); }
-//     else {
-//         Note* note = new Note(data, this);
-//         Notes[data->id] = note;
-//     }
-
-//     UpdateFile();
-// }
 
 void App::CreateNote(Data* data, int x, int y) { dbgout("");
     if (!data) { 
@@ -131,7 +72,6 @@ void App::DeleteNote(int id, Note* note) { dbgout("");
         Notes[id] = nullptr;
     }
 }
-
 
 // Deletes: Note from Notes, Data from Datas, record from file
 void App::DeleteNoteData(int id) { dbgout("");

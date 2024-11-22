@@ -17,6 +17,7 @@ add_executable(sticky-notes2
     src/file.cpp
     src/color.cpp
     src/selector.cpp 
+    src/settings.cpp
 )
 
 set(CMAKE_EXE_LINKER_FLAGS "-static -static-libgcc -static-libstdc++")

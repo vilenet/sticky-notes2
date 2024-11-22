@@ -1,13 +1,17 @@
 #include "note.h"
 #include "dout.h"
 #include "color.h"
+#include "settings.h"
+
+#include <FL/fl_ask.H> 
+#include <FL/Fl_Choice.H>
 
 
 Note::Note(Data* data, App* pApp)
         : m_pApp(pApp)
         , Fl_Window(data->x, data->y, data->w, data->h, data->title.c_str())
         , editor(0, 0, data->w, data->h)
-        , fl_color(ColorUtil::str2color(data->str_color))
+        , m_Flcolor(ColorUtil::str2color(data->str_color))
         , m_data(data)
 {
     setState(true);
@@ -15,12 +19,12 @@ Note::Note(Data* data, App* pApp)
 
     buffer.text(m_data->text.c_str());
     editor.buffer(&buffer);
-    editor.color(fl_color);
+    editor.color(m_Flcolor);
 
     end();
 
     Fl_Window::show();
-    setIcon("menu_icon.ico");
+    setIcon("menu_icon.ico", "taskbar_icon.ico");
     createMenu();
     setWinProc();
 
@@ -43,25 +47,48 @@ void Note::updateCheckerCallback(void* userdata) {
     Fl::add_timeout(5.0, updateCheckerCallback, userdata);
 }
 
+// getTers SetTers
 int  Note::getId() const { return m_data->id; }
+
 void Note::setState(bool state) { m_data->state = state; }
 bool Note::getState() { return m_data->state; }
+
+void Note::setTitle(const std::string& title) {
+    m_data->title = title;
+    label(m_data->title.c_str());
+    redraw();
+}
+std::string Note::getTitle() const { return m_data->title; }
+
+void Note::setColor(Fl_Color color) {
+    m_Flcolor = color;
+    editor.color(color);
+    editor.redraw();
+}
+Fl_Color Note::getColor() { return m_Flcolor; }
+
+// Markers
+void Note::setColorChanged(bool val) { isColorChanged = val; }
+void Note::setTitleChanged(bool val) { isTitleChanged = val; }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Win32 Icon & Menu process methods Implementation of Note
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 HWND Note::getHWND() { return fl_xid(this); }
 
-void Note::setIcon(const std::string& iconPath) { dbgout("");
-    HICON hIcon = (HICON)LoadImageA(nullptr, iconPath.c_str(), IMAGE_ICON, 32, 32, LR_LOADFROMFILE);
-    if (hIcon) {
-        SendMessage(getHWND(), WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
-        SendMessage(getHWND(), WM_SETICON, ICON_BIG, (LPARAM)hIcon);
-    }
+void Note::setIcon(const std::string& iconMenu, const std::string& iconTaskbar) { dbgout("");
+    HICON hicon_menu = (HICON)LoadImageA(nullptr, iconMenu.c_str(), IMAGE_ICON, 32, 32, LR_LOADFROMFILE);
+    HICON hIcon_taskbar = (HICON)LoadImageA(nullptr, iconTaskbar.c_str(), IMAGE_ICON, 64, 64, LR_LOADFROMFILE);
+
+    if (hicon_menu) { SendMessage(getHWND(), WM_SETICON, ICON_SMALL, (LPARAM)hicon_menu); }
+    if (hIcon_taskbar) { SendMessage(getHWND(), WM_SETICON, ICON_BIG, (LPARAM)hIcon_taskbar); }
 }
 
 void Note::createMenu() { dbgout("");
     hMenu = CreatePopupMenu();
+    AppendMenuW(hMenu, MF_STRING, 1000, L"Settings");
+    AppendMenuW(hMenu, MF_SEPARATOR, 0, nullptr);
+
     AppendMenuW(hMenu, MF_STRING, 1001, L"New");
     AppendMenuW(hMenu, MF_STRING, 1002, L"Open");
     AppendMenuW(hMenu, MF_STRING, 1003, L"Delete");
@@ -83,6 +110,7 @@ void Note::showMenu() { dbgout("");
 
 void Note::handleMenu(int command) { dbgout("");
     switch (command) {
+        case 1000: action_settings(); break;
         case 1001: action_new();    break;
         case 1002: action_open();   break;
         case 1003: action_delete(); break;
@@ -136,10 +164,18 @@ void Note::resize(int X, int Y, int W, int H) { dbgout("");
 void Note::UpdateData() { 
     bool needsSave = false;
 
-    if (isStateChanged) { needsSave = true; }
+    if (isStateChanged) {
+        isStateChanged = false;
+        needsSave = true; 
+    }
 
-    if (isColorChanged) { 
-        m_data->str_color = ColorUtil::color2str(fl_color);
+    if (isTitleChanged) { 
+        isTitleChanged = false;
+        needsSave = true; 
+    }
+
+    if (isColorChanged) { dbgout("Note ColorChanged");
+        m_data->str_color = ColorUtil::color2str(m_Flcolor);
         isColorChanged = false;
         needsSave = true;
     }
@@ -171,19 +207,37 @@ void Note::UpdateData() {
 // Close & Menu Action methods Implementation of Note
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Note::action_close() { dbgout("");
-    setState(false); 
+    setState(false);
     isStateChanged = true;
     UpdateData();
     hide();
     if (m_pApp) m_pApp->DeleteNote(getId(), this);
 }
 
-void Note::action_new()    { dbgout(""); 
+void Note::action_new() { dbgout(""); 
     int newX = x() + 20;
     int newY = y() + 20;
     m_pApp->CreateNote(nullptr, newX, newY); 
 }
 
+void Note::action_settings() {
+    Settings* settings = new Settings(x(), y(), w(), this);
+    settings->show();
+}
+
 void Note::action_open()   { dbgout(""); m_pApp->OpenNote(); }
-void Note::action_delete() { dbgout(""); m_pApp->DeleteNoteData(getId()); }
+void Note::action_delete() { 
+    dbgout(""); 
+
+    int response = fl_choice(
+        "Are you sure you want to delete this note?",
+        "Delete", //0     
+        "Cancel", //1
+        nullptr                                       
+    );
+
+    if (response == 0) { 
+        m_pApp->DeleteNoteData(getId());
+    } 
+}
 void Note::action_exit()   { dbgout(""); exit(0); }
