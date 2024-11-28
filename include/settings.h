@@ -19,6 +19,7 @@ private:
     int m_window_h;
     int m_centerX;
     Note* m_pNote;
+    
 public:
     Settings(int x, int y, int w, Note* pNote);
     ~Settings() = default;

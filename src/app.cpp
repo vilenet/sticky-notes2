@@ -1,5 +1,4 @@
 #include "app.h"
-#include "selector.h"
 #include "dout.h"
 
 
@@ -26,14 +25,6 @@ void App::LoadData() {
 void App::BuildNotes() { 
     for (const auto& pair : Datas) { CreateNote(pair.second); }
     if (Datas.empty()) { CreateNote(nullptr); }
-}
-
-void App::OpenNote() { 
-    NoteSelector selector(Datas);
-    Data* selectedData = selector.select();
-    if (selectedData) {
-        CreateNote(selectedData);
-    }
 }
 
 Data* App::CreateData() { 
@@ -91,3 +82,5 @@ void App::DeleteNoteData(int id) {
 
     UpdateFile();
 }
+
+std::unordered_map<int, Data*> App::GetDatas() { return Datas; }

@@ -2,6 +2,7 @@
 #include "dout.h"
 #include "color.h"
 #include "settings.h"
+#include "selector.h"
 
 #include <FL/fl_ask.H> 
 #include <FL/Fl_Choice.H>
@@ -225,10 +226,12 @@ void Note::action_settings() {
     settings->show();
 }
 
-void Note::action_open()   {  m_pApp->OpenNote(); }
-void Note::action_delete() { 
-     
+void Note::action_open() {
+    NoteSelector* pNoteSelector = new NoteSelector(x(), y(), 300, 300, "Open Note", m_pApp);
+    pNoteSelector->Run();
+}
 
+void Note::action_delete() { 
     int response = fl_choice(
         "Are you sure you want to delete this note?",
         "Delete", //0     

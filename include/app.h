@@ -29,9 +29,9 @@ public:
     void CreateNote(Data* data = nullptr, int = 100, int = 100);
     void UpdateData(Data* data);
     void UpdateFile();
-    void OpenNote();
     void DeleteNote(int id, Note* pNote);
     void DeleteNoteData(int id);
+    std::unordered_map<int, Data*> GetDatas();
 };
 
 #endif // APP_H
