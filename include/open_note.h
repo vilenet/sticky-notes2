@@ -1,5 +1,5 @@
-#ifndef SELECTOR_H
-#define SELECTOR_H
+#ifndef OPEN_NOTE_H
+#define OPEN_NOTE_H
 
 #include "data.h"
 #include "app.h"
@@ -31,4 +31,4 @@ public:
     void Run();
 };
 
-#endif // SELECTOR_H
+#endif // OPEN_NOTE_H

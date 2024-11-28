@@ -9,14 +9,14 @@ find_package(FLTK REQUIRED PATHS "C:/libs/fltk" NO_DEFAULT_PATH)
 include_directories(${FLTK_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_executable(sticky-notes2 
+add_executable(sticky-notes2
     src/main.cpp 
     src/app.cpp 
     src/note.cpp 
     src/data.cpp
     src/file.cpp
     src/color.cpp
-    src/selector.cpp 
+    src/open_note.cpp 
     src/settings.cpp
 )
 

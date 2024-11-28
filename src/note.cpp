@@ -2,7 +2,7 @@
 #include "dout.h"
 #include "color.h"
 #include "settings.h"
-#include "selector.h"
+#include "open_note.h"
 
 #include <FL/fl_ask.H> 
 #include <FL/Fl_Choice.H>
