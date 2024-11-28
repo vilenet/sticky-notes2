@@ -23,7 +23,12 @@ void NoteSelector::Run() {
     }
 }
 
-void NoteSelector::selectNote() {
+void NoteSelector::openCallback(Fl_Widget* w, void* userdata) {
+    NoteSelector* self = static_cast<NoteSelector*>(userdata);
+    self->on_button_click();
+}
+
+void NoteSelector::on_button_click() {
     int selected_index = browser->value();
 
     if (selected_index > 0) {

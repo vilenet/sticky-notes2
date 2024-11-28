@@ -21,12 +21,8 @@ private:
 
     App* m_pApp;
 
-    static void openCallback(Fl_Widget* w, void* userdata) {
-        NoteSelector* selector = static_cast<NoteSelector*>(userdata);
-        selector->selectNote();
-    }
-
-    void selectNote();
+    static void openCallback(Fl_Widget* w, void* userdata);
+    void on_button_click();
 
 public:
     NoteSelector(int x, int y, int w, int h, const char* title, App* pApp);
