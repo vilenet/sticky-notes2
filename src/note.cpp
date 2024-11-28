@@ -227,8 +227,8 @@ void Note::action_settings() {
 }
 
 void Note::action_open() {
-    NoteSelector* pNoteSelector = new NoteSelector(x(), y(), 300, 300, "Open Note", m_pApp);
-    pNoteSelector->Run();
+    COpenNote* pOpenNote = new COpenNote(x(), y(), 300, 300, "Open Note", m_pApp);
+    pOpenNote->Run();
 }
 
 void Note::action_delete() { 

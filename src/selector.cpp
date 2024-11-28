@@ -2,38 +2,37 @@
 #include "dout.h"
 
 
-NoteSelector::NoteSelector(int x, int y, int w, int h, const char* title, App* pApp)
+COpenNote::COpenNote(int x, int y, int w, int h, const char* title, App* pApp)
     : Fl_Window(x, y, w, h, title)
     , m_pApp(pApp)
 {
-    browser = new Fl_Hold_Browser(10, 10, this->w() - 20, this->h() - 60);
-    openBtn = new Fl_Button(10, this->h() - 40, this->w() - 20, 30, "Open");
+    m_pBrowser = new Fl_Hold_Browser(10, 10, this->w() - 20, this->h() - 60);
+    m_pOpenButton  = new Fl_Button(10, this->h() - 40, this->w() - 20, 30, "Open");
     
     InitBrowser();
 
-    openBtn->callback(openCallback, this);
+    m_pOpenButton->callback(open_button_callback, this);
     set_modal();
     end();
 }
 
-void NoteSelector::Run() {
+void COpenNote::Run() {
     show();
     while (shown()) {
         Fl::wait();
     }
 }
 
-void NoteSelector::openCallback(Fl_Widget* w, void* userdata) {
-    NoteSelector* self = static_cast<NoteSelector*>(userdata);
-    self->on_button_click();
+void COpenNote::open_button_callback(Fl_Widget* w, void* userdata) {
+    COpenNote* self = static_cast<COpenNote*>(userdata);
+    self->on_open_button_click();
 }
 
-void NoteSelector::on_button_click() {
-    int selected_index = browser->value();
+void COpenNote::on_open_button_click() {
+    int selected_index = m_pBrowser->value();
 
     if (selected_index > 0) {
-        const char* selected_item = browser->text(selected_index);
-        Data* pData = static_cast<Data*>(browser->data(selected_index));
+        Data* pData = static_cast<Data*>(m_pBrowser->data(selected_index));
 
         if (pData) {
             m_pApp->CreateNote(pData);
@@ -43,8 +42,8 @@ void NoteSelector::on_button_click() {
     hide();
 }
 
-void NoteSelector::InitBrowser() {
-    if (!browser) return;
+void COpenNote::InitBrowser() {
+    if (!m_pBrowser) return;
 
     std::unordered_map<int, Data*> Datas = m_pApp->GetDatas();
 
@@ -53,7 +52,7 @@ void NoteSelector::InitBrowser() {
     for (const auto& pair : Datas) {
         Data* data = pair.second;
         if (data && !data->state) {
-            browser->add(data->title.c_str(), static_cast<void*>(data));
+            m_pBrowser->add(data->title.c_str(), static_cast<void*>(data));
         }
     }
 }
