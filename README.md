@@ -1,4 +1,6 @@
-# Sticky Notes Program — Version 2
+# Sticky Notes
+
+This is a minimally functional program that is already usable but not yet complete: additional settings need to be implemented, a database may need to be connected, code optimization is required, ...
 
 ### 1. Sticky Notes
 ![Sticky Notes](images/Sticky%20Notes.png)
@@ -20,7 +22,10 @@ This screenshot shows the settings window of the application, where the followin
 These changes have been applied, demonstrating how users can customize each note to their preferences.
 
 
-- [Version 1](https://github.com/vilenet/sticky-notes.git)
+This is a Windows/Win32 dependent version. 
+
+The cross-platform version will be available in the repository: https://github.com/vilenet/sticky-notes.git.
+
 
 ### Overview
 This is the **second version** of the Sticky Notes program, designed to utilize a standard Win32 window with a built-in title bar. However, it introduces **custom behavior** for the window icon (located in the top-left corner), effectively transforming it into a functional button. This approach allows for creating a faux button using the window icon area, enhancing the window's interactivity without modifying the native title bar.
