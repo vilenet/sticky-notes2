@@ -9,8 +9,15 @@
 ### 3. Sticky Note Settings
 ![Sticky Note Settings Window](images/Sticky%20Note%20Menu%20Settings.png)
 
-### 4. Settings Changed Title & Color)
+### 4. Settings (Title and Color Changed)
+
 ![Changed Title & Color](images/Sticky%20Note%20Menu%20Settings%20Changed%20Title%20Color.png)
+
+This screenshot shows the settings window of the application, where the following changes have already been made:
+- The note's title has been updated to "TODO".
+- The note's color has been changed to green from the available palette.
+
+These changes have been applied, demonstrating how users can customize each note to their preferences.
 
 
 - [Version 1](https://github.com/vilenet/sticky-notes.git)
