@@ -1,10 +1,16 @@
 # Sticky Notes Program — Version 2
 
-![Sticky Notes Desktop](images/Sticky%20Notes.png)
+### 1. Sticky Notes
+![Sticky Notes](images/Sticky%20Notes.png)
 
-![Menu Options](images/Sticky%20Note%20Menu.png)
+### 2. Sticky Note Menu
+![Sticky Note Menu Options](images/Sticky%20Note%20Menu.png)
 
-![Menu Options](images/Sticky%20Note%20Menu%20Settings%20Changed%20Title%20Color.png)
+### 3. Sticky Note Settings
+![Sticky Note Settings Window](images/Sticky%20Note%20Menu%20Settings.png)
+
+### 4. Settings Changed Title & Color)
+![Changed Title & Color](images/Sticky%20Note%20Menu%20Settings%20Changed%20Title%20Color.png)
 
 
 - [Version 1](https://github.com/vilenet/sticky-notes.git)
