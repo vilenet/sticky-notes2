@@ -16,18 +16,25 @@
 
 class COpenNote : public Fl_Window {
 private:
+    // Fl widgets
     Fl_Hold_Browser* m_pBrowser;
     Fl_Button* m_pOpenButton;
 
     App* m_pApp;
 
-    static void open_button_callback(Fl_Widget* w, void* userdata);
-    void on_open_button_click();
+private:
+    // Fl widgets Callbacks
+    static void OpenButtonCallback(Fl_Widget* w, void* userdata);
+
+    // Fl widgets Setup
+    void SetupBrowser();
+    void SetupOpenButton();
+
+    void Open();
 
 public:
     COpenNote(int x, int y, int w, int h, const char* title, App* pApp);
 
-    void InitBrowser();
     void Run();
 };
 

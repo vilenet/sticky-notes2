@@ -27,15 +27,18 @@ class App;
 
 class Note : public Fl_Window {
 private:
-    Data* m_data;
-    App*  m_pApp;
+    // Fl widgets
+    Fl_Text_Editor m_FlEditor;
+    Fl_Text_Buffer m_FlBuffer;
 
     Fl_Color m_Flcolor;
-    Fl_Text_Editor editor;
-    Fl_Text_Buffer buffer;
 
+    // WinApi
     WNDPROC winProc = nullptr;
     HMENU hMenu;
+
+    Data* m_data;
+    App*  m_pApp;
 
     bool isTextChanged = false;
     bool isPositionChanged = false;
@@ -45,50 +48,53 @@ private:
     bool isTitleChanged = false;
 
 private:
-    static void textChangedCallback(Fl_Widget* widget, void* userdata);
-    static void updateCheckerCallback(void* userdata);
+    // Callbacks
+    static void TextChangedCallback(int, int, int, int, const char*, void*);
+    static void UpdateCheckerCallback(void* userdata);
 
 public:
     Note(Data* data, App* pApp);
     ~Note();
 
-    int  getId() const;
-    Str  getTitle() const;
-    void setTitle(const Str& name);
-    void setText(const Str& text);
-    Str  getText() const;
-    void setState(bool);
-    bool getState();
-    void setColor(Fl_Color);
-    Fl_Color getColor();
+    // Getters & Setters
+    int  GetID() const;
+    Str  GetTitle() const;
+    void SetTitle(const Str& name);
+    void SetText(const Str& text);
+    Str  GetText() const;
+    void SetState(bool);
+    bool GetState();
+    void SetColor(Fl_Color);
+    Fl_Color GetColor();
 
     // Icon & Menu
-    HWND getHWND();
-    void setIcon(const Str& iconMenu, const Str& iconTaskbar);
-    void createMenu();
-    void showMenu();
-    void handleMenu(int command);
-    void setWinProc();
+    HWND GetHWND();
+    void SetIcon(const Str& iconMenu, const Str& iconTaskbar);
+    void CreateMenu();
+    void ShowMenu();
+    void HandleMenu(int command);
+    void SetWinProc();
     static LRESULT CALLBACK WinProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-    // Actions 
-    void action_settings();
-    void action_close();
-    void action_new();
-    void action_open();
-    void action_delete();
-    void action_exit();
+    // On Menu Click Actions
+    void OpenSettings();
+    void CloseNote();
+    void NewNote();
+    void OpenNote();
+    void DeleteNote();
+    void ExitApp();
 
     void UpdateData();
+
+    // Fl widgets Setup
+    void SetupTxtEditor();
 
     // Overrided
     void resize(int X, int Y, int W, int H) override;
 
-    //TODO remove
-    friend class App;
-
-    void setColorChanged(bool);
-    void setTitleChanged(bool);
+    // Flag Setters
+    void SetColorChanged(bool);
+    void SetTitleChanged(bool);
 };
 
 #endif // NOTE_H

@@ -9,83 +9,95 @@
 
 
 Note::Note(Data* data, App* pApp)
-        : m_pApp(pApp)
-        , Fl_Window(data->x, data->y, data->w, data->h, data->title.c_str())
-        , editor(0, 0, data->w, data->h)
-        , m_Flcolor(ColorUtil::str2color(data->str_color))
-        , m_data(data)
-{
-    setState(true);
-    resizable(editor);
+    : Fl_Window(data->x, data->y, data->w, data->h, data->title.c_str())
+    , m_Flcolor(ColorUtil::str2color(data->str_color))
+    , m_FlEditor(0, 0, data->w, data->h)
+    , m_data(data)
+    , m_pApp(pApp)
+{  
+    SetState(true);
 
-    buffer.text(m_data->text.c_str());
-    editor.buffer(&buffer);
-    editor.color(m_Flcolor);
+    SetupTxtEditor();
 
     end();
 
     Fl_Window::show();
-    setIcon("menu_icon.ico", "taskbar_icon.ico");
-    createMenu();
-    setWinProc();
+    SetIcon("menu_icon.ico", "taskbar_icon.ico");
+    CreateMenu();
+    SetWinProc();
 
-    editor.callback(textChangedCallback, this);
-    Fl::add_timeout(5.0, updateCheckerCallback, this);
+    Fl::add_timeout(1.0, UpdateCheckerCallback, this);
 }
 
-Note::~Note() {  editor.buffer(nullptr); }
+Note::~Note() { 
+    m_FlEditor.buffer(nullptr); 
+    m_FlBuffer.text(nullptr);
+    Fl::remove_timeout(UpdateCheckerCallback, this);
+}
 
-//Callbacks
-void Note::textChangedCallback(Fl_Widget* widget, void* userdata) {
+void Note::SetupTxtEditor() {  
+    if (m_FlEditor.buffer() != nullptr) return;
+    resizable(m_FlEditor);
+    m_FlBuffer.text(m_data->text.c_str());
+    m_FlEditor.buffer(&m_FlBuffer);
+    m_FlEditor.color(m_Flcolor);
+
+    m_FlBuffer.add_modify_callback(TextChangedCallback, this);
+    m_FlEditor.when(FL_WHEN_CHANGED);
+}
+
+// Callbacks
+void Note::TextChangedCallback(int pos, int nInserted, int nDeleted, int nRestyled, const char* deletedText, void* userdata) {
+    
     Note* note = static_cast<Note*>(userdata);
-    note->isTextChanged = true;  
-    note->UpdateData();
+    note->isTextChanged = true; 
 }
 
-void Note::updateCheckerCallback(void* userdata) {
+void Note::UpdateCheckerCallback(void* userdata) {
     Note* note = static_cast<Note*>(userdata);
     note->UpdateData();
-    Fl::add_timeout(5.0, updateCheckerCallback, userdata);
+    Fl::add_timeout(0.5, UpdateCheckerCallback, userdata);
 }
 
-// getTers SetTers
-int  Note::getId() const { return m_data->id; }
+// GetTers & SetTers
+int  Note::GetID() const { return m_data->id; }
 
-void Note::setState(bool state) { m_data->state = state; }
-bool Note::getState() { return m_data->state; }
+void Note::SetState(bool state) { m_data->state = state; }
+bool Note::GetState() { return m_data->state; }
 
-void Note::setTitle(const std::string& title) {
+void Note::SetTitle(const std::string& title) {
     m_data->title = title;
     label(m_data->title.c_str());
     redraw();
 }
-std::string Note::getTitle() const { return m_data->title; }
+std::string Note::GetTitle() const { return m_data->title; }
 
-void Note::setColor(Fl_Color color) {
+void Note::SetColor(Fl_Color color) {
     m_Flcolor = color;
-    editor.color(color);
-    editor.redraw();
+    m_FlEditor.color(color);
+    m_FlEditor.redraw();
 }
-Fl_Color Note::getColor() { return m_Flcolor; }
 
-// Markers
-void Note::setColorChanged(bool val) { isColorChanged = val; }
-void Note::setTitleChanged(bool val) { isTitleChanged = val; }
+Fl_Color Note::GetColor() { return m_Flcolor; }
+
+// Flag Setters
+void Note::SetColorChanged(bool val) { isColorChanged = val; }
+void Note::SetTitleChanged(bool val) { isTitleChanged = val; }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Win32 Icon & Menu process methods Implementation of Note
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-HWND Note::getHWND() { return fl_xid(this); }
+HWND Note::GetHWND() { return fl_xid(this); }
 
-void Note::setIcon(const std::string& iconMenu, const std::string& iconTaskbar) { 
+void Note::SetIcon(const std::string& iconMenu, const std::string& iconTaskbar) {   
     HICON hicon_menu = (HICON)LoadImageA(nullptr, iconMenu.c_str(), IMAGE_ICON, 32, 32, LR_LOADFROMFILE);
     HICON hIcon_taskbar = (HICON)LoadImageA(nullptr, iconTaskbar.c_str(), IMAGE_ICON, 64, 64, LR_LOADFROMFILE);
 
-    if (hicon_menu) { SendMessage(getHWND(), WM_SETICON, ICON_SMALL, (LPARAM)hicon_menu); }
-    if (hIcon_taskbar) { SendMessage(getHWND(), WM_SETICON, ICON_BIG, (LPARAM)hIcon_taskbar); }
+    if (hicon_menu) { SendMessage(GetHWND(), WM_SETICON, ICON_SMALL, (LPARAM)hicon_menu); }
+    if (hIcon_taskbar) { SendMessage(GetHWND(), WM_SETICON, ICON_BIG, (LPARAM)hIcon_taskbar); }
 }
 
-void Note::createMenu() { 
+void Note::CreateMenu() { 
     hMenu = CreatePopupMenu();
     AppendMenuW(hMenu, MF_STRING, 1000, L"Settings");
     AppendMenuW(hMenu, MF_SEPARATOR, 0, nullptr);
@@ -96,26 +108,26 @@ void Note::createMenu() {
     AppendMenuW(hMenu, MF_STRING, 1004, L"Exit");
 }
 
-void Note::showMenu() { 
-    if (!hMenu) { createMenu(); }
+void Note::ShowMenu() { 
+    if (!hMenu) { CreateMenu(); }
 
-    HWND hwnd = getHWND();
+    HWND hwnd = GetHWND();
     RECT clientRect;
     GetClientRect(hwnd, &clientRect);
     POINT topLeft = { clientRect.left, clientRect.top };
     ClientToScreen(hwnd, &topLeft);
 
     int cmd = TrackPopupMenu(hMenu, TPM_RETURNCMD | TPM_LEFTBUTTON, topLeft.x, topLeft.y, 0, hwnd, nullptr);
-    if (cmd > 0) { handleMenu(cmd); }
+    if (cmd > 0) { HandleMenu(cmd); }
 }
 
-void Note::handleMenu(int command) { 
+void Note::HandleMenu(int command) { 
     switch (command) {
-        case 1000: action_settings(); break;
-        case 1001: action_new();    break;
-        case 1002: action_open();   break;
-        case 1003: action_delete(); break;
-        case 1004: action_exit();   break;
+        case 1000: OpenSettings(); break;
+        case 1001: NewNote(); break;
+        case 1002: OpenNote(); break;
+        case 1003: DeleteNote(); break;
+        case 1004: ExitApp(); break;
     }
 }
 
@@ -124,10 +136,10 @@ LRESULT CALLBACK Note::WinProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
     if (view) {
         switch (uMsg) {
-            case WM_NCLBUTTONDOWN: if (wParam == HTSYSMENU)               { view->showMenu(); return 0; } break;
-            case WM_SYSCOMMAND:    if ((wParam & 0xFFF0) == SC_MOUSEMENU) { view->showMenu(); return 0; } break;
+            case WM_NCLBUTTONDOWN: if (wParam == HTSYSMENU)               { view->ShowMenu(); return 0; } break;
+            case WM_SYSCOMMAND:    if ((wParam & 0xFFF0) == SC_MOUSEMENU) { view->ShowMenu(); return 0; } break;
             case WM_CLOSE: 
-                view->action_close();
+                view->CloseNote();
                 return 0;
         }
         return CallWindowProc(view->winProc, hwnd, uMsg, wParam, lParam);
@@ -135,8 +147,8 @@ LRESULT CALLBACK Note::WinProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
-void Note::setWinProc() {
-    HWND hwnd = getHWND();
+void Note::SetWinProc() {
+    HWND hwnd = GetHWND();
     if (hwnd == nullptr) { std::cerr << "Error: Cannot get win descriptor HWND" << std::endl; return; }
 
     if (winProc == nullptr) {
@@ -148,7 +160,7 @@ void Note::setWinProc() {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// Resize  Implementation of Note
+// Override "resize" Implementation of Note
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Note::resize(int X, int Y, int W, int H) { 
     if (m_data->x != X || m_data->y != Y || m_data->w != W || m_data->h != H) {
@@ -182,7 +194,7 @@ void Note::UpdateData() {
     }
 
     if (isTextChanged) {
-        m_data->text = buffer.text();
+        m_data->text = m_FlBuffer.text();
         isTextChanged = false;
         needsSave = true;
     }
@@ -207,31 +219,31 @@ void Note::UpdateData() {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Close & Menu Action methods Implementation of Note
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void Note::action_close() { 
-    setState(false);
+void Note::CloseNote() { 
+    SetState(false);
     isStateChanged = true;
     UpdateData();
     hide();
-    if (m_pApp) m_pApp->DeleteNote(getId(), this);
+    if (m_pApp) m_pApp->DeleteNote(GetID(), this);
 }
 
-void Note::action_new() {  
+void Note::NewNote() {  
     int newX = x() + 20;
     int newY = y() + 20;
     m_pApp->CreateNote(nullptr, newX, newY); 
 }
 
-void Note::action_settings() {
-    Settings* settings = new Settings(x(), y(), w(), this);
-    settings->show();
+void Note::OpenSettings() {
+    CSettings* pSettings = new CSettings(x(), y(), w(), 150, "Settings", this);
+    pSettings->show();
 }
 
-void Note::action_open() {
+void Note::OpenNote() {
     COpenNote* pOpenNote = new COpenNote(x(), y(), 300, 300, "Open Note", m_pApp);
     pOpenNote->Run();
 }
 
-void Note::action_delete() { 
+void Note::DeleteNote() { 
     int response = fl_choice(
         "Are you sure you want to delete this note?",
         "Delete", //0     
@@ -240,7 +252,8 @@ void Note::action_delete() {
     );
 
     if (response == 0) { 
-        m_pApp->DeleteNoteData(getId());
+        m_pApp->DeleteNoteData(GetID());
     } 
 }
-void Note::action_exit()   {  exit(0); }
+
+void Note::ExitApp() { exit(0); }

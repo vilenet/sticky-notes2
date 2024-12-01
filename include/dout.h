@@ -4,6 +4,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cstring>
+#include <string>
 
 extern int debug_counter;
 
@@ -18,5 +19,15 @@ extern int debug_counter;
               << std::setw(30) << std::left << msg \
               << "]" << std::endl
 
+//TODO 
+// struct STracer {
+//     std::string funcName;
+//     STracer(const std::string& func) : funcName(func) 
+//     { std::cout << "Enter: " << funcName << std::endl; }
+//     ~STracer() 
+//     { std::cout << "Exit: " << funcName << std::endl; }
+// };
+
+//#define TRACE_FUNCTION STracer tracer(__FUNCTION__)
 
 #endif // DOUT_H

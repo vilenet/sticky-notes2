@@ -6,29 +6,20 @@ COpenNote::COpenNote(int x, int y, int w, int h, const char* title, App* pApp)
     : Fl_Window(x, y, w, h, title)
     , m_pApp(pApp)
 {
-    m_pBrowser = new Fl_Hold_Browser(10, 10, this->w() - 20, this->h() - 60);
-    m_pOpenButton  = new Fl_Button(10, this->h() - 40, this->w() - 20, 30, "Open");
-    
-    InitBrowser();
-
-    m_pOpenButton->callback(open_button_callback, this);
     set_modal();
+
+    SetupBrowser();
+    SetupOpenButton();
+
     end();
 }
 
-void COpenNote::Run() {
-    show();
-    while (shown()) {
-        Fl::wait();
-    }
-}
-
-void COpenNote::open_button_callback(Fl_Widget* w, void* userdata) {
+void COpenNote::OpenButtonCallback(Fl_Widget* w, void* userdata) {
     COpenNote* self = static_cast<COpenNote*>(userdata);
-    self->on_open_button_click();
+    self->Open();
 }
 
-void COpenNote::on_open_button_click() {
+void COpenNote::Open() {
     int selected_index = m_pBrowser->value();
 
     if (selected_index > 0) {
@@ -42,8 +33,8 @@ void COpenNote::on_open_button_click() {
     hide();
 }
 
-void COpenNote::InitBrowser() {
-    if (!m_pBrowser) return;
+void COpenNote::SetupBrowser() {
+    m_pBrowser = new Fl_Hold_Browser(10, 10, this->w() - 20, this->h() - 60);
 
     std::unordered_map<int, Data*> Datas = m_pApp->GetDatas();
 
@@ -54,5 +45,17 @@ void COpenNote::InitBrowser() {
         if (data && !data->state) {
             m_pBrowser->add(data->title.c_str(), static_cast<void*>(data));
         }
+    }
+}
+
+void COpenNote::SetupOpenButton() {  
+    m_pOpenButton = new Fl_Button(10, this->h() - 40, this->w() - 20, 30, "Open");
+    m_pOpenButton->callback(OpenButtonCallback, this);
+}
+
+void COpenNote::Run() {  
+    show();
+    while (shown()) { 
+        Fl::wait();
     }
 }
