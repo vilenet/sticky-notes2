@@ -1,9 +1,20 @@
 #include "app.h"
 #include "dout.h"
+#include "database.h"
 
 
 App::App() { 
     UtilFile.Init();
+
+    m_pDatabase = new CDatabase("data/data.db");
+    if (!m_pDatabase->Open()) {
+        std::cerr << "Error opening database." << std::endl;
+        //TODO: Handle errors or terminate the application
+    }
+    if (!m_pDatabase->CreateTable()) {
+        std::cerr << "Error creating table." << std::endl;
+        //TODO: Handle errors or terminate the application
+    }
 }
 
 void App::Run() { 
@@ -13,8 +24,7 @@ void App::Run() {
 }
 
 void App::LoadData() { 
-    std::string str = UtilFile.Read();
-    Datas = UtilData.Str2Data(str);
+    Datas = m_pDatabase->GetAllData();
 
     for (const auto& pair : Datas) {
         Data* data = pair.second;
@@ -39,32 +49,36 @@ void App::CreateNote(Data* data, int x, int y) {
         data = CreateData(); 
         data->x = x;
         data->y = y;
+        data->state = true;
+
+        if (!m_pDatabase->InsertData(*data)) {
+            std::cerr << "Error inserting data." << std::endl;
+            //TODO: Error handling
+        }
+    } 
+    else {
+        data->state = true;
     }
-    data->state = true;
     Note* note = new Note(data, this);
     Notes[data->id] = note;
-
-    UpdateFile();
 }
 
-void App::UpdateData(Data* data) { 
+void App::UpdateData(Data* data) {
     Datas[data->id] = data;
-    UpdateFile();
-}
 
-void App::UpdateFile() { 
-    std::string strData = UtilData.Data2Str(Datas);
-    UtilFile.Write(strData);
+    if (!m_pDatabase->UpdateData(*data)) {
+        std::cerr << "Error updating data." << std::endl;
+        //TODO: Error handling
+    }
 }
 
 void App::DeleteNote(int id, Note* note) { 
     if (Notes[id] == note) {
         delete note;
-        Notes[id] = nullptr;
+        Notes.erase(id);
     }
 }
 
-// Deletes: Note from Notes, Data from Datas, record from file
 void App::DeleteNoteData(int id) { 
     auto noteIt = Notes.find(id);
     if (noteIt != Notes.end()) {
@@ -80,7 +94,10 @@ void App::DeleteNoteData(int id) {
         Datas.erase(dataIt);
     }
 
-    UpdateFile();
+    if (!m_pDatabase->DeleteData(id)) {
+        std::cerr << "Error deleting data." << std::endl;
+        //TODO: Error handling
+    }
 }
 
 std::unordered_map<int, Data*> App::GetDatas() { return Datas; }
